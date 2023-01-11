@@ -19,6 +19,21 @@ class PhraseService {
     return phrases;
   }
 
+  async search({
+    limit=15,
+    offset=0,
+    order,
+    sort,
+  }) {
+    const phrases = await this.phraseRepository.findAll({
+      offset: parseInt(offset),
+      limit: parseInt(limit) || undefined,
+      order: [[ sort || 'createdAt', order || 'ASC' ]],
+    });
+
+    return phrases;
+  }
+
   async create(data) {
     const phraseAlreadyExists = await this.phraseRepository.findOne({
       where: {
@@ -31,6 +46,10 @@ class PhraseService {
     const phrase = await this.phraseRepository.create(data);
 
     return phrase;
+  }
+
+  async delete(id) {
+    await this.phraseRepository.destroy(id);
   }
 
   async getPhraseToUser(userId) {

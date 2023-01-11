@@ -109,7 +109,6 @@ class Tasks {
   }
 
   async verifySchedules() {
-    console.log(new Date())
     const schedules = await this.scheduleRepository.findAll({
       where: {
         success: false,

@@ -1,6 +1,7 @@
 const { createContainer } = require('awilix');
 const express = require('express');
 const helmet = require('helmet');
+const cors = require('cors');
 const Router = require('./bootstrap/Router');
 const utils = require('./utils');
 const bootstrap = require('./bootstrap');
@@ -23,6 +24,7 @@ class App {
 
   configure() {
     this.app.use(helmet());
+    this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 

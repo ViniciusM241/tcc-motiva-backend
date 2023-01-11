@@ -29,6 +29,14 @@ class PhraseRepository {
     });
   }
 
+  destroy(id) {
+    return this.phraseModel.destroy({
+      where: {
+        id,
+      },
+    });
+  }
+
 }
 
 module.exports.default = PhraseRepository;

@@ -17,4 +17,20 @@ module.exports = [
       adminAuth,
     ],
   },
+  {
+    path: '/users/search',
+    method: 'get',
+    action: 'search',
+    beforeMiddlewares: [
+      adminAuth,
+    ],
+  },
+  {
+    path: '/users/:id/chat',
+    method: 'get',
+    action: 'chat',
+    beforeMiddlewares: [
+      adminAuth,
+    ],
+  },
 ];
