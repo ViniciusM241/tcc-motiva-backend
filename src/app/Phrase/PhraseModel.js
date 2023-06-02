@@ -6,6 +6,10 @@ class PhraseModel extends Model {
   dataTypes = () => ({
     text: this.DataTypes.TEXT('long'),
     author: this.DataTypes.STRING(100),
+    disabledAt: {
+      type: this.DataTypes.DATE,
+      defaultValue: null,
+    },
   });
 
   relationships = () => [

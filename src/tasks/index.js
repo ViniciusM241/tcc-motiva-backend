@@ -57,7 +57,6 @@ class Tasks {
   handleSendingPhrases() {
     return schedule.scheduleJob('*/1 * * * *', async () => {
       await this.scheduleSendingPhrases();
-
       await this.verifySchedules();
     });
   }
@@ -78,7 +77,7 @@ class Tasks {
         const [hours, minutes] = user.messageSchedule.split(':');
         let date = new Date(new Date().setHours(hours, minutes, 0));
 
-        if (new Date().getTime() > date.getTime()) {
+        if ((new Date().getTime() - 60) > date.getTime()) {
           date.setDate(date.getDate() + 1)
         }
 
@@ -86,7 +85,7 @@ class Tasks {
           where: {
             userId: user.id,
             success: false,
-          }
+          },
         });
 
         if (schedule) {
@@ -124,7 +123,7 @@ class Tasks {
   }
 
   async handlePendingEvaluations() {
-    const minutesToChange = 5;
+    const minutesToChange = 2;
     const pendingEvaluations = await this.userRepository.findAll({
       where: { status: 'EVALUATION_WAITING' }
     });

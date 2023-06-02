@@ -4,7 +4,7 @@ module.exports = {
     askName: () => `Nos informe o seu *nome*:`,
     askSchedule: (name) => `Quase pronto!!\nAgora para finalizar, ${name}, nos informe o melhor horário para receber as frases\nEx: 21h30 ou 21h00`,
     wrongSchedule: () => `O horário informado é inválido, tente novamente`,
-    done: (name) => `Muito bom. Parabéns pelo cadastro!!\n\nObrigado por se cadastrar no BOT Motiva. Logo, logo a sua frase chegará para melhorar o seu dia, ${name}`,
+    done: (name, schedule) => `Muito bom. Parabéns pelo cadastro!!\n\nObrigado por se cadastrar no BOT Motiva. Logo, logo a sua frase chegará para melhorar ${schedule.split(':')[0] > 19 && schedule.split(':')[0] < 4 ? "a sua noite" : "o seu dia"}, ${name}`,
   },
   actionMenu: {
     description: (name) => `Olá, ${name}. Você tem algumas opções para interagir com o BOT.\n\nEscolha uma:`,

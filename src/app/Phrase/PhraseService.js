@@ -14,7 +14,11 @@ class PhraseService {
   }
 
   async show() {
-    const phrases = await this.phraseRepository.findAll();
+    const phrases = await this.phraseRepository.findAll({
+      where: {
+        disabledAt: null,
+      },
+    });
 
     return phrases;
   }
@@ -53,7 +57,12 @@ class PhraseService {
   }
 
   async getPhraseToUser(userId) {
-    const phrases = await this.phraseRepository.findAll({ attributes: ['id'] });
+    const phrases = await this.phraseRepository.findAll({
+      attributes: ['id'],
+      where: {
+        disabledAt: null,
+      },
+    });
     const phrasesAlreadySent = await this.scheduleRepository.findAll({
       attributes: ['phraseId'],
       where: {

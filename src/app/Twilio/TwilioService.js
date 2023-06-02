@@ -73,7 +73,7 @@ class TwillioService {
 
       await this.userService.updateStatus(user.id, 'STAND_BY');
 
-      return this.messages.register.done(user.name);
+      return this.messages.register.done(user.name, messageSchedule);
     }
 
     return this.messages.register.welcome();
@@ -216,6 +216,18 @@ class TwillioService {
 
   async unsubscribe(body, user) {
     await this.userRepository.destroy(user.id);
+    const schedules = await this.scheduleRepository.findAll({
+      where: {
+        userId: user.id,
+      },
+      raw: true,
+    });
+
+    Promise.all(
+      schedules.map(async (schedule) => {
+        await this.scheduleRepository.destroy(schedule.id);
+      })
+    );
 
     return this.messages.unsubscribe();
   }
@@ -276,7 +288,7 @@ class TwillioService {
       ],
     });
 
-    if (!schedule.users || !schedule.phrases) return
+    if (!schedule.users || !schedule.phrases) return;
 
     const message = `"${schedule.phrases.text}"\n\n- *_${schedule.phrases.author}_*`;
 
@@ -291,12 +303,34 @@ class TwillioService {
     }
   }
 
+  async forceEvaluation(body) {
+    const user = await this.findUserByWaId(body.WaId);
+
+    const lastSchedule = await this.scheduleService.lastSchedule(user.id);
+
+    if (!lastSchedule) return;
+
+    const message = this.messages.evaluation.askEvaluation(user.name);
+
+    await this.evaluationRepository.create({
+      userId: user.id,
+      phraseId: lastSchedule.phraseId,
+      status: 'PENDING',
+    });
+
+    await this.userService.updateStatus(user.id, 'EVALUATION');
+
+    return message;
+  }
+
   async handleSendingEvaluations(user) {
+    const lastSchedule = await this.scheduleService.lastSchedule(user.id);
+
+    if (!lastSchedule) return;
+
     const message = this.messages.evaluation.askEvaluation(user.name);
 
     await this.sendMessage(message, user, `/messages-callback`);
-
-    const lastSchedule = await this.scheduleService.lastSchedule(user.id);
 
     await this.evaluationRepository.create({
       userId: user.id,
@@ -322,8 +356,7 @@ class TwillioService {
   }
 
   async confirmScheduleMessageSent(scheduleId, body) {
-
-    if (body.SmsStatus === 'delivered') {
+    if (body.SmsStatus === 'sent') {
       await this.scheduleRepository.update(scheduleId, {
         success: true,
       });

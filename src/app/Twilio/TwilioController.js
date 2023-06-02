@@ -20,6 +20,8 @@ class TwilioController {
       case 'MENU': return await this.twilioService.handleMenu(body);
       case 'UPDATE_PROFILE': return await this.twilioService.handleUpdateProfile(body);
       case 'EVALUATION': return await this.twilioService.handleEvaluation(body);
+      case 'EVALUATION_WAITING': return await this.twilioService.forceEvaluation(body);
+      default: return;
     }
   }
 
