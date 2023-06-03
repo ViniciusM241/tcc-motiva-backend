@@ -13,6 +13,20 @@ class AdminRepository {
     return this.adminModel.findOne(opts);
   }
 
+  findAll(opts) {
+    return this.adminModel.findAll(opts);
+  }
+
+  count(opts) {
+    return this.adminModel.count(opts);
+  }
+
+  destroy(id) {
+    return this.adminModel.destroy({
+      where: { id }
+    });
+  }
+
   create(data) {
     return this.adminModel.create(data);
   }

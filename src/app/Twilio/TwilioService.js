@@ -15,6 +15,9 @@ class TwillioService {
     scheduleRepository,
     messageRepository,
     evaluationRepository,
+    notificationMessageRepository,
+    notificationRepository,
+    adminRepository,
 
     messages,
   }) {
@@ -28,6 +31,9 @@ class TwillioService {
     this.scheduleRepository = scheduleRepository;
     this.messageRepository = messageRepository;
     this.evaluationRepository = evaluationRepository;
+    this.notificationMessageRepository = notificationMessageRepository;
+    this.notificationRepository = notificationRepository;
+    this.adminRepository = adminRepository;
 
     this.messages = messages;
 
@@ -138,6 +144,38 @@ class TwillioService {
       grade,
       status: 'EVALUATED'
     });
+
+    if (grade < 4) {
+      const title = 'Avaliação de frases';
+      const html = `
+        A frase #${evaluation.phraseId} recebeu uma nota baixa.<br>Valide a frase novamente com carinho!
+      `;
+
+      let notificationMessage = await this.notificationMessageRepository.findOne({
+        where: {
+          title,
+          html,
+        },
+      });
+
+      if (!notificationMessage) {
+        notificationMessage = await this.notificationMessageRepository.create({
+          title,
+          html,
+        });
+      }
+
+      const admins = await this.adminRepository.findAll();
+
+      Promise.all(
+        admins.map(async admin => {
+          await this.notificationRepository.create({
+            adminId: admin.id,
+            notificationMessageId: notificationMessage.id,
+          });
+        })
+      );
+    }
 
     await this.userService.updateStatus(user.id, 'STAND_BY');
 

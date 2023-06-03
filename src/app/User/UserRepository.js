@@ -5,6 +5,10 @@ class UserRepository {
     this.userModel = userModel.sequelize();
   }
 
+  count(opts) {
+    return this.userModel.count(opts);
+  }
+
   findAll(opts) {
     return this.userModel.findAll(opts);
   }

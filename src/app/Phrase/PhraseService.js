@@ -1,14 +1,18 @@
-const { Op } = require("sequelize");
-
 class PhraseService {
   constructor({
     phraseRepository,
     scheduleRepository,
+    notificationRepository,
+    notificationMessageRepository,
+    adminRepository,
 
     Error,
   }) {
     this.phraseRepository = phraseRepository;
     this.scheduleRepository = scheduleRepository;
+    this.notificationRepository = notificationRepository;
+    this.notificationMessageRepository = notificationMessageRepository;
+    this.adminRepository = adminRepository;
 
     this.error = Error;
   }
@@ -21,6 +25,41 @@ class PhraseService {
     });
 
     return phrases;
+  }
+
+  async getById(id) {
+    const phrase = await this.phraseRepository.findOne({
+      where: {
+        id,
+        disabledAt: null,
+      },
+    });
+
+    return phrase;
+  }
+
+  async update(id, data) {
+    const currentPhrase = await this.phraseRepository.findOne({
+      where: {
+        id,
+        disabledAt: null,
+      },
+    });
+
+    if (!currentPhrase) {
+      throw new this.error('Phrase not found', 400);
+    }
+
+    const phraseAlreadyExists = await this.phraseRepository.findOne({
+      where: {
+        text: data.text,
+        disabledAt: null,
+      },
+    });
+
+    if (phraseAlreadyExists) throw new this.error('Phrase already exists', 400);
+
+    await this.phraseRepository.update(id, data);
   }
 
   async search({
@@ -42,6 +81,7 @@ class PhraseService {
     const phraseAlreadyExists = await this.phraseRepository.findOne({
       where: {
         text: data.text,
+        disabledAt: null,
       },
     });
 
@@ -53,7 +93,20 @@ class PhraseService {
   }
 
   async delete(id) {
-    await this.phraseRepository.destroy(id);
+    const phrase = await this.phraseRepository.findOne({
+      where: {
+        id,
+        disabledAt: null,
+      },
+    });
+
+    if (!phrase) {
+      throw new this.error('Phrase not found', 400);
+    }
+
+    await this.phraseRepository.update(id, {
+      disabledAt: new Date(),
+    });
   }
 
   async getPhraseToUser(userId) {
@@ -79,7 +132,34 @@ class PhraseService {
     const filteredPhrases = phrases.filter(x => !phrasesAlreadySentId.includes(x.id));
 
     if (!filteredPhrases.length) {
-      // notify admins
+      const title = 'Cadastro de frases';
+      const html = 'As frases disponíveis estão acabando. Cadastre mais';
+
+      let notificationMessage = await this.notificationMessageRepository.findOne({
+        where: {
+          title,
+          html,
+        },
+      });
+
+      if (!notificationMessage) {
+        notificationMessage = await this.notificationMessageRepository.create({
+          title,
+          html,
+        });
+      }
+
+      const admins = await this.adminRepository.findAll();
+
+      Promise.all(
+        admins.map(async admin => {
+          await this.notificationRepository.create({
+            adminId: admin.id,
+            notificationMessageId: notificationMessage.id,
+          });
+        })
+      );
+
       return await this.phraseRepository.findOne();
     }
 

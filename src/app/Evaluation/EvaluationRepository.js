@@ -5,6 +5,10 @@ class EvaluationRepository {
     this.evaluationModel = evaluationModel.sequelize();
   }
 
+  count(opts) {
+    return this.evaluationModel.count(opts);
+  }
+
   findById(id, opts) {
     return this.evaluationModel.findByPk(id, opts);
   }

@@ -1,11 +1,13 @@
 class NotificationService {
   constructor({
+    notificationMessageModel,
     notificationRepository,
     notificationMessageRepository,
     adminRepository,
 
     Error,
   }) {
+    this.notificationMessageModel = notificationMessageModel.sequelize();
     this.notificationRepository = notificationRepository;
     this.notificationMessageRepository = notificationMessageRepository;
     this.adminRepository = adminRepository;
@@ -13,19 +15,35 @@ class NotificationService {
     this.error = Error;
   }
 
-  async show() {
-
-  }
-
   async showByAdminId(id) {
-    console.log(id)
     const notifications = await this.notificationRepository.findAll({
       where: {
         adminId: id,
       },
+      include: {
+        model: this.notificationMessageModel,
+        as: 'notificationMessage',
+      },
+      order: [['viewed', 'desc']],
     });
 
     return notifications;
+  }
+
+  async viewNotification(adminId, notificationId) {
+    const notifications = await this.notificationRepository.findOne({
+      where: {
+        adminId,
+        id: notificationId,
+      },
+    });
+
+    if (!notifications) throw new this.error("Notification not found", 400);
+
+    await this.notificationRepository.update(notificationId, {
+      viewed: true,
+      viewedDate: new Date(),
+    });
   }
 
   async create(data) {

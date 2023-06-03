@@ -23,7 +23,7 @@ class EvaluationModel extends Model {
     {
       model: 'phrase',
       relation: 'belongsTo',
-      as: 'phrases',
+      as: 'phrase',
       foreignKey: 'phraseId',
     },
   ];

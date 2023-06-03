@@ -18,6 +18,22 @@ module.exports = [
     ],
   },
   {
+    path: '/phrases/:id',
+    method: 'get',
+    action: 'getById',
+    beforeMiddlewares: [
+      adminAuth,
+    ],
+  },
+    {
+    path: '/phrases/:id',
+    method: 'put',
+    action: 'update',
+    beforeMiddlewares: [
+      adminAuth,
+    ],
+  },
+  {
     path: '/phrases/search',
     method: 'get',
     action: 'search',

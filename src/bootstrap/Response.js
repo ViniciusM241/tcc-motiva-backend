@@ -23,8 +23,9 @@ class Response {
 
   _injectResponseHeader(data) {
     return {
-      name: 'API TESTE TCC',
-      date: new Date(),
+      name: 'API MotiViva',
+      version: "1.0",
+      date: new Date().toISOString(),
       data,
     }
   }

@@ -21,7 +21,6 @@ class PensadorService {
   }) {
     const handledTerm = `frases_de_${term.replace(' ', '_')}`;
     const handledPage = pageIndex > 0 ? `/${pageIndex}` : '';
-
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.goto(`https://www.pensador.com/${handledTerm}${handledPage}`);

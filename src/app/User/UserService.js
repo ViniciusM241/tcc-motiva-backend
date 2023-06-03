@@ -1,3 +1,4 @@
+const moment = require('moment');
 class UserService {
   constructor({
     userRepository,
@@ -21,26 +22,60 @@ class UserService {
 
   async search({
     limit=15,
-    offset=0,
+    page=0,
     order,
     sort,
   }) {
     const users = await this.userRepository.findAll({
-      offset: parseInt(offset),
+      offset: parseInt(page) * parseInt(limit),
       limit: parseInt(limit) || undefined,
       order: [[ sort || 'createdAt', order || 'ASC' ]],
+      raw: true,
     });
 
-    return users;
+    const count = await this.userRepository.count();
+
+    return {
+      users,
+      count,
+    };
   }
 
   async getChatByUserId(id) {
-    const chat = await this.messageRepository.findAll({
+    const messages = await this.messageRepository.findAll({
       where: {
         userId: id,
         success: true,
       },
       order: [['createdAt', 'DESC']],
+    });
+
+    const chat = {};
+
+    messages.forEach(message => {
+      const date = moment(message.createdAt).startOf('day');
+      let strDate = date.format('DD/MM/yyyy');
+
+      if (date.isSame(moment().startOf('day'))) {
+        strDate = 'Hoje';
+      }
+
+      if (date.isSame(moment().subtract(1, 'days').startOf('day'))) {
+        strDate = 'Ontem';
+      }
+
+      const handledMessage = {
+        ...message.dataValues,
+        time: moment(message.createdAt).format('HH::mm'),
+      };
+
+      if (chat[strDate]) {
+        chat[strDate].push(handledMessage);
+      } else {
+        chat[strDate] = [
+          handledMessage,
+        ];
+      }
     });
 
     return chat;

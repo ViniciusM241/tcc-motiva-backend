@@ -6,17 +6,64 @@ class AdminService {
     notificationService,
     notificationModel,
     notificationMessageModel,
+    Error,
   }) {
     this.adminRepository = adminRepository;
     this.notificationService = notificationService;
     this.notificationModel = notificationModel.sequelize();
     this.notificationMessageModel = notificationMessageModel.sequelize();
+
+    this.error = Error;
   }
 
-  async show() {
-    const admins = await this.adminRepository.findAll();
+  async search({
+    limit=15,
+    page=0,
+    order,
+    sort,
+  }) {
+    const admins = await this.adminRepository.findAll({
+      offset: parseInt(page) * parseInt(limit),
+      limit: parseInt(limit) || undefined,
+      order: [[ sort || 'createdAt', order || 'ASC' ]],
+      raw: true,
+    });
 
-    return admins;
+    const count = await this.adminRepository.count();
+
+    return {
+      admins,
+      count,
+    };
+  }
+
+  async getById(id) {
+    const admin = await this.adminRepository.findById(id);
+
+    return admin;
+  }
+
+  async updateById(id, data) {
+    const currentAdmin = await this.getById(id);
+
+    if (!currentAdmin) {
+      throw new this.error('Admin not found', 400);
+    }
+
+    if (data.password) {
+      const hashPassword = await hash(data.password, 8);
+      data.authToken = hashPassword;
+    }
+
+    await this.adminRepository.update(id, data);
+  }
+
+  async deleteById(id) {
+    const admin = await this.getById(id);
+
+    if (!admin) return;
+
+    await this.adminRepository.destroy(id);
   }
 
   async profile(id) {

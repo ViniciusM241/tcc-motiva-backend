@@ -10,9 +10,25 @@ module.exports = [
     ],
   },
   {
-    path: '/admins',
+    path: '/admins/:id',
+    method: 'put',
+    action: 'update',
+    beforeMiddlewares: [
+      adminAuth,
+    ],
+  },
+  {
+    path: '/admins/:id',
+    method: 'delete',
+    action: 'delete',
+    beforeMiddlewares: [
+      adminAuth,
+    ],
+  },
+  {
+    path: '/admins/search',
     method: 'get',
-    action: 'show',
+    action: 'search',
     beforeMiddlewares: [
       adminAuth,
     ],
@@ -26,9 +42,25 @@ module.exports = [
     ],
   },
   {
+    path: '/admins/:id',
+    method: 'get',
+    action: 'getById',
+    beforeMiddlewares: [
+      adminAuth,
+    ],
+  },
+  {
     path: '/admins/:id/notifications',
     method: 'get',
     action: 'showNotifications',
+    beforeMiddlewares: [
+      adminAuth,
+    ],
+  },
+  {
+    path: '/admins/:id/notifications/:notificationId',
+    method: 'put',
+    action: 'viewNotification',
     beforeMiddlewares: [
       adminAuth,
     ],
