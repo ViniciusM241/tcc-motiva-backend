@@ -147,9 +147,7 @@ class TwillioService {
 
     if (grade < 4) {
       const title = 'Avaliação de frases';
-      const html = `
-        A frase #${evaluation.phraseId} recebeu uma nota baixa.<br>Valide a frase novamente com carinho!
-      `;
+      const html = `A frase #${evaluation.phraseId} recebeu uma nota baixa.<br>Valide a frase novamente com carinho!`;
 
       let notificationMessage = await this.notificationMessageRepository.findOne({
         where: {

@@ -47,7 +47,7 @@ class UserService {
         userId: id,
         success: true,
       },
-      order: [['createdAt', 'DESC']],
+      order: [['createdAt', 'ASC']],
     });
 
     const chat = {};

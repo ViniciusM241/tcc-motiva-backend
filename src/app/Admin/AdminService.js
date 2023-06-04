@@ -40,6 +40,8 @@ class AdminService {
   async getById(id) {
     const admin = await this.adminRepository.findById(id);
 
+    admin.authToken = admin.authToken.substring(0, 8);
+
     return admin;
   }
 
@@ -51,8 +53,10 @@ class AdminService {
     }
 
     if (data.password) {
-      const hashPassword = await hash(data.password, 8);
-      data.authToken = hashPassword;
+      if (currentAdmin.authToken?.substring(0, 8) !== data.password) {
+        const hashPassword = await hash(data.password, 8);
+        data.authToken = hashPassword;
+      }
     }
 
     await this.adminRepository.update(id, data);

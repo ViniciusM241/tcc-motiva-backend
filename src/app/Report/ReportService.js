@@ -88,6 +88,10 @@ class ReportService {
     }, 0);
     const avg = sum / grades.length;
 
+    if (isNaN(avg)) {
+      return '0.0';
+    }
+
     return avg.toFixed(2);
   }
 
@@ -112,7 +116,7 @@ class ReportService {
         },
       ],
       order: [['grade', 'desc']],
-      limit: 4,
+      limit: 5,
     });
 
     return evaluations;

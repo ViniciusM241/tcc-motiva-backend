@@ -30,7 +30,13 @@ class AdminController {
   }
 
   async delete(req, res) {
+    const loggedAdminId = req.getUser().id;
     const { id } = req.params();
+
+    if (loggedAdminId === id) {
+      res.status(400);
+      return res.end();
+    }
 
     await this.adminService.deleteById(id);
 
