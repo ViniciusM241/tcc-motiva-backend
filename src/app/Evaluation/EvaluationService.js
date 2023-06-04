@@ -28,7 +28,7 @@ class EvaluationService {
       return 'Não avaliado';
     }
 
-    return avg.toFixed(2);
+    return avg.toFixed(1).replace('.0', '');
   }
 
 }

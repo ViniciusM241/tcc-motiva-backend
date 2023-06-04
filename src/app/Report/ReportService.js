@@ -92,7 +92,7 @@ class ReportService {
       return '0.0';
     }
 
-    return avg.toFixed(2);
+    return avg.toFixed(1).replace('.0', '');
   }
 
   async _getPhrasesRanking({ month, year }) {

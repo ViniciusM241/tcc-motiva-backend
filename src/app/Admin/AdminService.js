@@ -1,4 +1,5 @@
 const { hash } = require("bcryptjs");
+const { Op } = require("sequelize");
 
 class AdminService {
   constructor({
@@ -52,6 +53,19 @@ class AdminService {
       throw new this.error('Admin not found', 400);
     }
 
+    const existentEmail = await this.adminRepository.findOne({
+      where: {
+        email: data.email,
+        [Op.not]: {
+          id,
+        },
+      },
+    });
+
+    if (existentEmail) {
+      throw new this.error("E-mail já cadastrado", 400);
+    }
+
     if (data.password) {
       if (currentAdmin.authToken?.substring(0, 8) !== data.password) {
         const hashPassword = await hash(data.password, 8);
@@ -102,6 +116,16 @@ class AdminService {
   async create(data) {
     const hashPassword = await hash(data.password, 8);
     data.authToken = hashPassword;
+
+    const existentEmail = await this.adminRepository.findOne({
+      where: {
+        email: data.email,
+      },
+    });
+
+    if (existentEmail) {
+      throw new this.error("E-mail já cadastrado", 400);
+    }
 
     const admin = await this.adminRepository.create(data);
 
