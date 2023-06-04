@@ -24,7 +24,7 @@ class NotificationService {
         model: this.notificationMessageModel,
         as: 'notificationMessage',
       },
-      order: [['viewed', 'desc']],
+      order: [['viewed', 'ASC'], ['createdAt', 'DESC']],
     });
 
     return notifications;

@@ -1,6 +1,7 @@
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
+const clientBaseURL = process.env.CLIENT_BASE_URL;
 const client = require('twilio');
 
 class TwillioService {
@@ -148,6 +149,7 @@ class TwillioService {
     if (grade < 4) {
       const title = 'Avaliação de frases';
       const html = `A frase #${evaluation.phraseId} recebeu uma nota baixa.<br>Valide a frase novamente com carinho!`;
+      const link = `${clientBaseURL}/frases`;
 
       let notificationMessage = await this.notificationMessageRepository.findOne({
         where: {
@@ -160,6 +162,7 @@ class TwillioService {
         notificationMessage = await this.notificationMessageRepository.create({
           title,
           html,
+          link,
         });
       }
 

@@ -83,6 +83,7 @@ class AdminService {
           },
         },
       ],
+      order: [['notification', 'viewed', 'ASC'], ['notification', 'createdAt', 'DESC']],
     });
 
     return profile;

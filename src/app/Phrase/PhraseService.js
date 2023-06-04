@@ -1,3 +1,5 @@
+const { Op } = require("sequelize");
+
 class PhraseService {
   constructor({
     phraseRepository,
@@ -5,6 +7,7 @@ class PhraseService {
     notificationRepository,
     notificationMessageRepository,
     adminRepository,
+    evaluationService,
 
     Error,
   }) {
@@ -13,6 +16,7 @@ class PhraseService {
     this.notificationRepository = notificationRepository;
     this.notificationMessageRepository = notificationMessageRepository;
     this.adminRepository = adminRepository;
+    this.evaluationService = evaluationService;
 
     this.error = Error;
   }
@@ -24,7 +28,17 @@ class PhraseService {
       },
     });
 
-    return phrases;
+    const filteredPhrases = Promise.all(
+      phrases.map(async phrase => {
+        const avg = await this.evaluationService.evaluationAvgByPhrase(phrase.id);
+        return {
+          ...phrase.dataValues,
+          avg,
+        };
+      })
+    );
+
+    return filteredPhrases;
   }
 
   async getById(id) {
@@ -54,6 +68,9 @@ class PhraseService {
       where: {
         text: data.text,
         disabledAt: null,
+        [Op.not]: {
+          id,
+        },
       },
     });
 
@@ -72,9 +89,22 @@ class PhraseService {
       offset: parseInt(offset),
       limit: parseInt(limit) || undefined,
       order: [[ sort || 'createdAt', order || 'ASC' ]],
+      where: {
+        disabledAt: null,
+      },
     });
 
-    return phrases;
+    const filteredPhrases = Promise.all(
+      phrases.map(async phrase => {
+        const avg = await this.evaluationService.evaluationAvgByPhrase(phrase.id);
+        return {
+          ...phrase.dataValues,
+          avg,
+        };
+      })
+    );
+
+    return filteredPhrases;
   }
 
   async create(data) {

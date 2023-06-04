@@ -1,5 +1,7 @@
 const e = require('express');
 const puppeteer = require('puppeteer');
+const sequelize = require('sequelize');
+const { Op } = require('sequelize');
 
 class PensadorService {
   constructor({
@@ -25,18 +27,30 @@ class PensadorService {
     const page = await browser.newPage();
     await page.goto(`https://www.pensador.com/${handledTerm}${handledPage}`);
 
-    const phrases = await page.evaluate(() => {
+    const response = await page.evaluate(() => {
       const boxes = [...document.querySelectorAll('.thought-card')];
+      const title = document.querySelector('.title');
+      const description = document.querySelector('.description');
+      const countStr = description ? description.innerText : title.innerText;
+      const count = countStr?.replace(/\D/g, '');
 
-      return boxes.reduce((acc, cur) => {
+      const phrases = boxes.reduce((acc, cur) => {
+        const texts = cur.querySelector('.autor').innerText?.split('\n');
+
         return [
           ...acc,
           {
             text: cur.querySelector('.frase').innerText,
-            author: cur.querySelector('.autor').innerText,
+            author: texts?.length ? texts[0] : 'Não reconhecido',
           },
         ];
       }, []);
+
+      return {
+        phrases,
+        count,
+        hasMore: true,
+      };
     });
 
     await browser.close();
@@ -44,10 +58,12 @@ class PensadorService {
     const filteredPhrases = [];
 
     await Promise.all(
-      phrases.map(async (phrase) => {
+      response.phrases.map(async (phrase) => {
         const dbPhrase = await this.phraseRepository.findOne({
           where: {
-            text: phrase.text,
+            [Op.and]: [
+              sequelize.literal("phrases.text = '" + phrase.text + "' COLLATE utf8mb4_unicode_ci")
+            ],
           },
         });
 
@@ -55,7 +71,11 @@ class PensadorService {
       })
     );
 
-    return filteredPhrases;
+    return {
+      phrases: filteredPhrases,
+      total: response.count || '0',
+      hasMore: response.hasMore,
+    };
   }
 }
 
