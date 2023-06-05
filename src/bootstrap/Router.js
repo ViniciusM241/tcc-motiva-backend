@@ -64,7 +64,7 @@ class Router {
       const afterMiddlewares = route.afterMiddlewares || [];
       const actions = [ ...beforeMiddlewares, this.routeAction(route), ...afterMiddlewares ];
 
-      this.app.route(route.path)[route.method](...actions);
+      this.app.route(`/api${route.path}`)[route.method](...actions);
     });
 
     this.registerNotFoundRoute();
