@@ -347,7 +347,11 @@ class TwillioService {
 
     const lastSchedule = await this.scheduleService.lastSchedule(user.id);
 
-    if (!lastSchedule) return;
+    if (!lastSchedule) {
+      await this.userService.updateStatus(user.id, 'STAND_BY');
+
+      return;
+    }
 
     const message = this.messages.evaluation.askEvaluation(user.name);
 
