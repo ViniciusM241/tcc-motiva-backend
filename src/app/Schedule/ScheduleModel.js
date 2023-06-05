@@ -18,13 +18,13 @@ class ScheduleModel extends Model {
 
   relationships = () => [
     {
-      model: 'user',
+      model: 'User',
       relation: 'belongsTo',
       as: 'users',
       foreignKey: 'userId',
     },
     {
-      model: 'phrase',
+      model: 'Phrase',
       relation: 'belongsTo',
       as: 'phrases',
       foreignKey: 'phraseId',

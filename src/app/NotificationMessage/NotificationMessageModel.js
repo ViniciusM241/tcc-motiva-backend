@@ -12,14 +12,14 @@ class NotificationMessage extends Model {
 
   relationships = () => [
     {
-      model: 'admin',
+      model: 'Admin',
       relation: 'belongsToMany',
       as: 'admin',
       foreignKey: 'notificationMessageId',
       through: new NotificationModel().sequelize(),
     },
     {
-      model: 'notification',
+      model: 'Notification',
       relation: 'hasMany',
       as: 'notification',
       foreignKey: 'notificationMessageId',

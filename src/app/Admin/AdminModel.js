@@ -13,7 +13,7 @@ class Admin extends Model {
 
   relationships = () => [
     {
-      model: 'notification',
+      model: 'Notification',
       as: 'notification',
       relation: 'belongsToMany',
       foreignKey: 'adminId',

@@ -16,7 +16,7 @@ class Notification extends Model {
 
   relationships = () => [
     {
-      model: 'notificationMessage',
+      model: 'NotificationMessage',
       relation: 'belongsTo',
       as: 'notificationMessage',
     },

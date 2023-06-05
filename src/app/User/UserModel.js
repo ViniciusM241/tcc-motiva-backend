@@ -20,7 +20,7 @@ class User extends Model {
 
   relationships = () => [
     {
-      model: 'schedule',
+      model: 'Schedule',
       relation: 'hasMany',
       as: 'schedules',
       foreignKey: 'userId',
