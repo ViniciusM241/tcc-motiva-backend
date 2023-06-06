@@ -119,7 +119,16 @@ class ReportService {
       limit: 5,
     });
 
-    return evaluations;
+    const filteredEvaluations = [];
+
+    evaluations.forEach(x => {
+      const texts = filteredEvaluations.map(x => x.phrase.text);
+
+      if (!texts.includes(x.phrase.text))
+        filteredEvaluations.push(x);
+    });
+
+    return filteredEvaluations;
   }
 }
 
